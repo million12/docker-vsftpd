@@ -1,0 +1,2 @@
+vsftpd:
+  image: million12/vsftpd
