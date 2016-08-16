@@ -1,0 +1,29 @@
+machine:
+  services:
+    - docker
+  environment:
+    FTP_USER: circle-user
+    FTP_PASS: circle-pass
+    ANONYMOUS_ACCESS: true
+
+
+dependencies:
+  pre:
+    - docker info && docker version
+
+# Run tests
+test:
+  pre:
+    - docker build -t million12/vsftpd .
+
+  override:
+    # Run with anonymous support
+    - docker run -d -p 1020-1021:20-21 -p 21100-21110:21100-21110 -e FTP_USER=$FTP_USER -e FTP_PASS=$FTP_PASS -e ANONYMOUS_ACCESS=$ANONYMOUS_ACCESS --name vsftpd million12/vsftpd
+    - docker logs -f vsftpd | tee -a ${CIRCLE_ARTIFACTS}/vsftpd.log:
+          background: true
+    - while true; do if grep "VSFTPD daemon starting" -a ${CIRCLE_ARTIFACTS}/vsftpd.log; then break; else sleep 1; fi done
+    # Test access for anonymous user
+    - curl -s -L ftp://127.0.0.1:1021 | grep "pub"
+    # Create directory for test user and verify it's existence
+    - ./test.sh
+    - curl -s -L ftp://127.0.0.1:1021 --user $FTP_USER:$FTP_PASS | grep circle-test

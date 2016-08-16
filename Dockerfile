@@ -8,14 +8,10 @@ ENV FTP_USER=admin \
 
 RUN \
   rpm --rebuilddb && yum clean all && \
-  yum install -y httpd vsftpd && \
-  yum clean all && \
-  mkdir -p /home/vsftpd/
+  yum install -y vsftpd && \
+  yum clean all
 
 COPY container-files /
-
-VOLUME  /home/vsftpd \
-        /var/log/vsftpd
 
 EXPOSE 20-21 21100-21110
 
