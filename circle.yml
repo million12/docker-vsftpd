@@ -8,14 +8,11 @@ machine:
 
 
 dependencies:
-  pre:
-    - docker info && docker version
+  override:
+    - docker build -t million12/vsftpd .
 
 # Run tests
 test:
-  pre:
-    - docker build -t million12/vsftpd .
-
   override:
     # Run with anonymous support
     - docker run -d -p 1020-1021:20-21 -p 21100-21110:21100-21110 -e FTP_USER=$FTP_USER -e FTP_PASS=$FTP_PASS -e ANONYMOUS_ACCESS=$ANONYMOUS_ACCESS --name vsftpd million12/vsftpd
@@ -25,5 +22,11 @@ test:
     # Test access for anonymous user
     - curl -s -L ftp://127.0.0.1:1021 | grep "pub"
     # Create directory for test user and verify it's existence
-    - ./test.sh
+    - |
+      ftp -n 127.0.0.1 1021 << EOF
+        quote USER circle-user
+        quote PASS circle-pass
+        mkdir circle-test
+        quit
+      EOF
     - curl -s -L ftp://127.0.0.1:1021 --user $FTP_USER:$FTP_PASS | grep circle-test
