@@ -64,6 +64,8 @@ cat << EOB
 	· Log file: $LOG_FILE
 EOB
 else
+    mkdir -p /var/log/vsftpd
+    touch ${LOG_FILE}
     /usr/bin/ln -sf /dev/stdout $LOG_FILE
 fi
 
