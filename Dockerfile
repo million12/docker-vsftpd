@@ -4,7 +4,8 @@ MAINTAINER Przemyslaw Ozgo przemek@m12.io
 ENV FTP_USER=admin \
     FTP_PASS=random \
     LOG_STDOUT=false \
-    ANONYMOUS_ACCESS=false
+    ANONYMOUS_ACCESS=false \
+    UPLOADED_FILES_WORLD_READABLE=false
 
 RUN \
   rpm --rebuilddb && yum clean all && \

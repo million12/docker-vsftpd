@@ -45,6 +45,12 @@ This vsftpd docker image is based on official CentOS 7 image and comes with foll
 |Accepted values:|`true` or `false`|
 |Description:|Grants access to user `anonymous` need to have access to files in `/var/ftp/pub` directory.|
 
+|UPLOADED_FILES_WORLD_READABLE||
+|---|---|
+|Default:|`UPLOADED_FILES_WORLD_READABLE=false`|
+|Accepted values:|`true` or `false`|
+|Description:|Changes the permmissions of uploaded files to `rw- r-- r--`. This makes files readable by other users.|
+
 ### Basic usage
 
     docker run \

@@ -37,6 +37,12 @@ if [ "${ANONYMOUS_ACCESS}" = "true" ]; then
   log "Enabled access for anonymous user."
 fi
 
+# Uploaded files world readable settings
+if [ "${UPLOADED_FILES_WORLD_READABLE}" = "true" ]; then
+  sed -i "s|local_umask=077|local_umask=022|g" /etc/vsftpd/vsftpd.conf
+  log "Uploaded files will become world readable."
+fi
+
 # Create home dir and update vsftpd user db:
 mkdir -p "/home/vsftpd/${FTP_USER}"
 log "Created home directory for user: ${FTP_USER}"
