@@ -43,6 +43,14 @@ if [ "${UPLOADED_FILES_WORLD_READABLE}" = "true" ]; then
   log "Uploaded files will become world readable."
 fi
 
+# WIP-----------------------------------------
+# Custom passive address settings
+if [ "${CUSTOM_PASSIVE_ADDRESS}" = "true" ]; then
+  sed -i "s|local_umask=077|local_umask=022|g" /etc/vsftpd/vsftpd.conf
+  log "Uploaded files will become world readable."
+fi
+
+
 # Create home dir and update vsftpd user db:
 mkdir -p "/home/vsftpd/${FTP_USER}"
 log "Created home directory for user: ${FTP_USER}"
