@@ -5,7 +5,8 @@ ENV FTP_USER=admin \
     FTP_PASS=random \
     LOG_STDOUT=false \
     ANONYMOUS_ACCESS=false \
-    UPLOADED_FILES_WORLD_READABLE=false
+    UPLOADED_FILES_WORLD_READABLE=false \
+    CUSTOM_PASSIVE_ADDRESS=false
 
 RUN \
   rpm --rebuilddb && yum clean all && \

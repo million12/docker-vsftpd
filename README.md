@@ -51,6 +51,13 @@ This vsftpd docker image is based on official CentOS 7 image and comes with foll
 |Accepted values:|`true` or `false`|
 |Description:|Changes the permmissions of uploaded files to `rw- r-- r--`. This makes files readable by other users.|
 
+|CUSTOM_PASSIVE_ADDRESS||
+|---|---|
+|Default:|`CUSTOM_PASSIVE_ADDRESS=false`|
+|Accepted values:|`ip address` or `false`|
+|Description:|Passive Address that gets advertised by vsftpd when responding to PASV command. This is useul when running behind a proxy, or with docker swarm.|
+
+
 ### Basic usage
 
     docker run \
