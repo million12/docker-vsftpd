@@ -1,11 +1,11 @@
 version: 2
 jobs:
-  build and test:
+  build&test:
     machine: true
     steps:
       - checkout
       - run: |
-          docker build -t million12/vsftpd:$CIRCLE_SHA1 .
+          docker build -t million12/vsftpd:${CIRCLE_SHA1:0:7} .
           docker run -d \
           -p 1020-1021:20-21 -p 21100-21110:21100-21110 \
           -e FTP_USER=circle-user \
@@ -13,7 +13,7 @@ jobs:
           -e LOG_STDOUT=true \
           -e ANONYMOUS_ACCESS=true \
           --name vsftpd \
-          million12/vsftpd:$CIRCLE_SHA1
+          million12/vsftpd:${CIRCLE_SHA1:0:7}
           while true; do if docker logs vsftpd | grep "VSFTPD daemon starting"; then break; else sleep 1; fi done
           curl -s -L ftp://127.0.0.1:1021 | grep "pub"
           ftp -n 127.0.0.1 1021 << EOF
@@ -24,11 +24,23 @@ jobs:
           EOF
           curl -s -L ftp://127.0.0.1:1021 --user circle-user:circle-pass | grep circle-test
 
+
+  deploy:
+    machine: true
+    steps:
+      - checkout
+      - run: |
+          docker build -t million12/vsftpd:${CIRCLE_SHA1:0:7} .
+          docker build -t million12/vsftpd:latest .
+          echo "$DOCKER_HUB_PASS" | docker login -u "$DOCKER_HUB_USER" --password-stdin
+          docker push million12/vsftpd:${CIRCLE_SHA1:0:7}
+
+
 workflows:
   version: 2
   build test deploy:
     jobs:
-      - build and test:
+      - build&test:
           filters:
             branches:
               only:
@@ -36,13 +48,11 @@ workflows:
                 - dev
                 - /update.*/
                 - /bugfix.*/
-      # - test:
-      #     filters:
-      #       branches:
-      #         only:
-      #           - master
-      #           - dev
-      #           - /update.*/
-      #           - /bugfix.*/
-      #     requires:
-      #       - build
+      - deploy:
+          filters:
+            branches:
+              only:
+                - master
+                - /bugfix.*/
+          requires:
+            - build&test
