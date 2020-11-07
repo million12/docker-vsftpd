@@ -1,35 +1,44 @@
 version: 2
 jobs:
   build:
-    machine: true
+    docker:
+      - image: circleci/buildpack-deps:stretch
     steps:
       - checkout
-      - run: |
-          docker build -t million12/vsftpd .
+      - setup_remote_docker:
+          docker_layer_caching: true
+      - run:
+          - name: Build docker image
+          - command: |
+              docker build -t million12/vsftpd:$CIRCLE_SHA1 .
 
   test:
-    machine: true
+    docker:
+      - image: circleci/buildpack-deps:stretch
     steps:
       - checkout
-      - run: |
-          docker build -t million12/vsftpd .
-          docker run -d \
-          -p 1020-1021:20-21 -p 21100-21110:21100-21110 \
-          -e FTP_USER=circle-user \
-          -e FTP_PASS=circle-pass \
-          -e LOG_STDOUT=true \
-          -e ANONYMOUS_ACCESS=true \
-          --name vsftpd \
-          million12/vsftpd
-          while true; do if docker logs vsftpd | grep "VSFTPD daemon starting"; then break; else sleep 1; fi done
-          curl -s -L ftp://127.0.0.1:1021 | grep "pub"
-          ftp -n 127.0.0.1 1021 << EOF
-          quote USER circle-user
-          quote PASS circle-pass
-          mkdir circle-test
-          quit
-          EOF
-          curl -s -L ftp://127.0.0.1:1021 --user circle-user:circle-pass | grep circle-test
+      - setup_remote_docker:
+          docker_layer_caching: true
+      - run:
+          - name: Test image
+          - command: |
+              docker run -d \
+              -p 1020-1021:20-21 -p 21100-21110:21100-21110 \
+              -e FTP_USER=circle-user \
+              -e FTP_PASS=circle-pass \
+              -e LOG_STDOUT=true \
+              -e ANONYMOUS_ACCESS=true \
+              --name vsftpd \
+              million12/vsftpd:$CIRCLE_SHA1
+              while true; do if docker logs vsftpd | grep "VSFTPD daemon starting"; then break; else sleep 1; fi done
+              curl -s -L ftp://127.0.0.1:1021 | grep "pub"
+              ftp -n 127.0.0.1 1021 << EOF
+              quote USER circle-user
+              quote PASS circle-pass
+              mkdir circle-test
+              quit
+              EOF
+              curl -s -L ftp://127.0.0.1:1021 --user circle-user:circle-pass | grep circle-test
 
 workflows:
   version: 2
