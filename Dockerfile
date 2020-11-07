@@ -1,5 +1,4 @@
-FROM centos:7
-MAINTAINER Przemyslaw Ozgo przemek@m12.io
+FROM centos:8
 
 ENV FTP_USER=admin \
     FTP_PASS=random \
@@ -9,8 +8,8 @@ ENV FTP_USER=admin \
     CUSTOM_PASSIVE_ADDRESS=false
 
 RUN \
-  rpm --rebuilddb && yum clean all && \
-  yum install -y vsftpd && \
+  yum clean all && \
+  yum install -y vsftpd ncurses && \
   yum clean all
 
 COPY container-files /

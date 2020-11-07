@@ -21,16 +21,6 @@ if [ "$FTP_PASS" = "random" ]; then
     export FTP_PASS=`cat /dev/urandom | tr -dc A-Z-a-z-0-9 | head -c${1:-16}`
 fi
 
-# Do not log to STDOUT by default:
-if [ "$LOG_STDOUT" = "false" ]; then
-        export LOG_STDOUT=''
-elif [ "$LOG_STDOUT" = "true" ]; then
-        export LOG_STDOUT='Yes.'
-else
-  log "No LOG_STDOUT selected. System will crash"
-  exit 1
-fi
-
 # Anonymous access settings
 if [ "${ANONYMOUS_ACCESS}" = "true" ]; then
   sed -i "s|anonymous_enable=NO|anonymous_enable=YES|g" /etc/vsftpd/vsftpd.conf
@@ -49,7 +39,6 @@ if [ "${CUSTOM_PASSIVE_ADDRESS}" != "false" ]; then
   log "Passive mode will advertise address ${CUSTOM_PASSIVE_ADDRESS}"
 fi
 
-
 # Create home dir and update vsftpd user db:
 mkdir -p "/home/vsftpd/${FTP_USER}"
 log "Created home directory for user: ${FTP_USER}"
@@ -61,14 +50,21 @@ log "Updated /etc/vsftpd/virtual_users.txt"
 log "Updated vsftpd database"
 
 # Get log file path
-export LOG_FILE=`grep xferlog_file /etc/vsftpd/vsftpd.conf|cut -d= -f2`
-
-# Set permissions for FTP user
-chown -R ftp:ftp /home/vsftpd/
-log "Fixed permissions for newly created user: ${FTP_USER}"
+export LOG_FILE=`grep vsftpd_log_file /etc/vsftpd/vsftpd.conf|cut -d= -f2`
 
 # stdout server info:
-if [ ! $LOG_STDOUT ]; then
+if [ "${LOG_STDOUT}" = "true" ]; then
+  log "Enabling Logging to STDOUT"
+  mkdir -p /var/log/vsftpd
+  touch ${LOG_FILE}
+  tail -f ${LOG_FILE} | tee /dev/fd/1 &
+elif [ "${LOG_STDOUT}" = "false" ]; then
+  log "Logging to STDOUT Disabled"
+else
+  log "LOG_STDOUT available options are 'true/false'"
+  exit 1
+fi
+
 cat << EOB
 	SERVER SETTINGS
 	---------------
@@ -76,11 +72,10 @@ cat << EOB
 	· FTP Password: $FTP_PASS
 	· Log file: $LOG_FILE
 EOB
-else
-    mkdir -p /var/log/vsftpd
-    touch ${LOG_FILE}
-    /usr/bin/ln -sf /dev/stdout $LOG_FILE
-fi
+
+# Set permissions for FTP user
+chown -R ftp:ftp /home/vsftpd/
+log "Fixed permissions for newly created user: ${FTP_USER}"
 
 log "VSFTPD daemon starting"
 # Run vsftpd:

@@ -1,5 +1,6 @@
 # VSFTPD Server in a Docker
 
+[![Discord](https://img.shields.io/discord/720919856815276063)](https://discord.com/channels/720919856815276063/774606101815099392)  
 [![CircleCI Build Status](https://img.shields.io/circleci/project/million12/docker-vsftpd/master.svg)](https://circleci.com/gh/million12/docker-vsftpd/tree/master)
 [![GitHub Open Issues](https://img.shields.io/github/issues/million12/docker-vsftpd.svg)](https://github.com/million12/docker-vsftpd/issues)
 [![GitHub Stars](https://img.shields.io/github/stars/million12/docker-vsftpd.svg)](https://github.com/million12/docker-vsftpd)
