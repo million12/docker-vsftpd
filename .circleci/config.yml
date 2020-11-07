@@ -24,7 +24,6 @@ jobs:
           EOF
           curl -s -L ftp://127.0.0.1:1021 --user circle-user:circle-pass | grep circle-test
 
-
   deploy:
     machine: true
     steps:
@@ -34,7 +33,7 @@ jobs:
           docker build -t million12/vsftpd:latest .
           echo "$DOCKER_HUB_PASS" | docker login -u "$DOCKER_HUB_USER" --password-stdin
           docker push million12/vsftpd:${CIRCLE_SHA1:0:7}
-
+          docker push million12/vsftpd:latest
 
 workflows:
   version: 2
@@ -53,6 +52,5 @@ workflows:
             branches:
               only:
                 - master
-                - /bugfix.*/
           requires:
             - build&test
