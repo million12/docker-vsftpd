@@ -13,7 +13,7 @@
 
 [![Deploy to Docker Cloud](https://files.cloud.docker.com/images/deploy-to-dockercloud.svg)](https://cloud.docker.com/stack/deploy/?repo=https://github.com/million12/docker-vsftpd/tree/master)  
 
-This vsftpd docker image is based on official CentOS 7 image and comes with following features:  
+This vsftpd docker image is based on official CentOS 8 image and comes with following features:  
 
   * Virtual users
   * Passive mode (`ports 21100-21110`)
