@@ -20,7 +20,7 @@ This vsftpd docker image is based on official CentOS 7 image and comes with foll
   * Logging to a file or STDOUT
   * Anonymous account access (defined by user on docker run `true/false`)
 
-### Environmental Variables
+### Environmental Variables
 
 |FTP_USER||
 |---|---|
